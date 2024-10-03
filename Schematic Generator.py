@@ -6,7 +6,6 @@ def main():
     # Check if the correct number of arguments is provided
     if len(sys.argv) != 2:
         exit("Usage: python Assembler.py <assemblyFile>")  # Exit the program with an error code
-        input_file = sys.argv[1]  # The first argument after the script name
 
     input_file = sys.argv[1]  # The first argument after the script name
 
