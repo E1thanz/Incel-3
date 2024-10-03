@@ -35,7 +35,7 @@ CONDITIONS = {"novf": "000", "ovf": "001", "nc": "010", "c": "011", "nmsb": "100
               "!overflow": "000", "overflow": "001", "!carry": "010", "carry": "011", "!msb": "100", "!zero": "110",
               "zero": "111",
               "!=": "110", "=": "111", "<": "010", ">=": "011", ">=0": "100", "<0": "101",
-              "!ovf": "000", "!c": "010", "!z": "110"}
+              "!ovf": "000", "!c": "010", "!z": "110", "eq": "111", "neq": "110"}
 LABELS = {}
 DEFINITIONS = {}
 
@@ -47,16 +47,14 @@ class PARAMETERS:
         try:
             return REGISTERS[value]
         except KeyError:
-            exit(
-                f"Invalid register on line {line} for instruction {instruction}, possible registers are: \n{REGISTERS.keys()}")
+            exit(f"Invalid register on line {line} for instruction {instruction}, possible registers are: \n{REGISTERS.keys()}")
 
     @staticmethod
     def Condition(value: str, line: int, instruction: str) -> str:
         try:
             return CONDITIONS[value]
         except KeyError:
-            exit(
-                f"Invalid condition on line {line} for instruction {instruction}, possible conditions are: \n{CONDITIONS.keys()}")
+            exit(f"Invalid condition on line {line} for instruction {instruction}, possible conditions are: \n{CONDITIONS.keys()}")
 
     @staticmethod
     def Single(value: str, line: int, instruction: str) -> str:

@@ -118,8 +118,8 @@ nc, !carry, <, !c
 c, carry, >=
 nmsb, !msb, >=0
 msb, <0
-nz, !zero, !z, !=
-z, zero, =
+nz, !zero, !z, !=, neq
+z, zero, =, eq
 ```
 
 
