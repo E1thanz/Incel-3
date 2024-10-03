@@ -26,6 +26,7 @@
     - 256 Bytes of RAM.
         - A dCache holding 2 lines of 16 bytes each.
         - The ability to use any register as a pointer + a 5-bit signed immediate offset.
+- **Instruction ROM**:
     - 4096 Words of Barrel Hex ROM.
         - An iCache holding 2 lines of 32 words each.
 - **Branch Prediction**: 8-entry branch target buffer (BTB).
