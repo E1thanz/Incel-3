@@ -53,17 +53,6 @@ mcschematic 11.4.2
 ```
 
 ## Installation
-### Method 1: Clone from GitHub
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/yourusername/incel3.git
-    ```
-2. Install the necessary Python libraries:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-### Method 2: Download as ZIP and Use with PyCharm
 1. Download the repository as a ZIP:
     - Click on the green **Code** button at the top right of the GitHub page.
     - Select **Download ZIP** and extract the files.
@@ -120,17 +109,30 @@ add r1 r0 1 r5 // this will perform addition with the last carry out as its carr
 pst r5 2 // store r5 to port 2
 ```
 
+### Conditions
+here is a list of the available names for conditions in the assembler:
+```
+novf, !overflow, !ovf
+ovf, overflow
+nc, !carry, <, !c
+c, carry, >=
+nmsb, !msb, >=0
+msb, <0
+nz, !zero, !z, !=
+z, zero, =
+```
 
-## Contributing
+
+### Contributing
 Contributions are welcome! If you find any issues or want to improve the assembler or schematic generator, feel free to open a pull request or issue.
 
-## License
+### License
 This project is licensed under the MIT License.
 
-## Contact
+### Contact
 For any questions or support, feel free to reach out on Discord: **eithanz**
 
-## Credits
+### Credits
 - **Alex_You**: Designed the ALU, Registers, dCache and Flag decoder, I could not have done it without them.
 - **Lord_Decapo, Koyarno, QSmally**: For answering various questions I had while planning the CPU.
 - **_Torb, zPippo\_**: Were helpful, found small bugs while roaming around the alu, and kept me company.
