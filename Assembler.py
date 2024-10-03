@@ -329,6 +329,7 @@ def main():
                     in_page_index += 1
                 for remaining_page in available_pages:
                     assembly_file.write(f">{remaining_page}\n")
+                assembly_file.write(f"-")
     except FileNotFoundError:
         exit(f"Error: File '{input_file}' not found")
     # print(f"Assembling file: {input_file}")
