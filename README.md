@@ -134,5 +134,5 @@ For any questions or support, feel free to reach out on Discord: **eithanz**
 
 ### Credits
 - **Alex_You**: Designed the ALU, Registers, dCache and Flag decoder, I could not have done it without them.
-- **Lord_Decapo, Koyarno, QSmally**: For answering various questions I had while planning the CPU.
-- **_Torb, zPippo\_**: Were helpful, found small bugs while roaming around the alu, and kept me company.
+- **Lord_Decapo, Koyarno and QSmally**: For answering various questions I had while planning the CPU.
+- **_Torb and zPippo\_**: Were helpful, found small bugs while roaming around the alu, and kept me company.
