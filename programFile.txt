@@ -1,0 +1,14 @@
+define secondValue 0x1 // defining the number 1 in hex
+ldi r1 0 // first fib number
+pst r1 1
+ldi r2 secondValue // second fib number
+pst r2 1
+>1
+// start of the loop
+.loop
+add r1 r2 r1
+pst r1 1
+add r1 r2 r2
+pst r2 1
+jmp .loop
+// bruh
