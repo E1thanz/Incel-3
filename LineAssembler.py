@@ -1,5 +1,6 @@
 import os
 import sys
+from multiprocessing.managers import Value
 
 
 class BIN:
@@ -126,7 +127,7 @@ INSTRUCTIONS = {"add": ((3, 4),
                         ("00100", PARAMETERS.Register, PARAMETERS.Register, "00", PARAMETERS.Register)),
                 "bsh": ((4, 5),
                         (
-                        "00101", PARAMETERS.Register, PARAMETERS.Register, PARAMETERS.Single, "0", PARAMETERS.Register),
+                            "00101", PARAMETERS.Register, PARAMETERS.Register, PARAMETERS.Single, "0", PARAMETERS.Register),
                         ("00101", PARAMETERS.Register, PARAMETERS.Register, PARAMETERS.Single, PARAMETERS.Single,
                          PARAMETERS.Register)),
                 "mld": ((2, 3),
@@ -174,168 +175,42 @@ INSTRUCTIONS = {"add": ((3, 4),
                 }
 
 
-def parse_for_comments(line: str) -> (str, str):
-    if '//' in line:
-        line = line.split('//')
-        comment = "//" + line[1]
-        return line[0].strip(), comment
-    if '#' in line:
-        line = line.split('#')
-        comment = "#" + line[1]
-        return line[0].strip(), comment
-    if ';' in line:
-        line = line.split(';')
-        comment = ";" + line[1]
-        return line[0].strip(), comment
-    return line, ""
-
-
-def pre_parse_program(input_file) -> list:
-    # total amount of pages
-    available_pages = [page for page in range(128)]
-    true_index = 0
-    for index, line in enumerate(input_file):
-        # this will just remove \n at the end and any trailing spaces
-        line = line.strip().lower()
-
-        # parse the line for comments
-        line, comment = parse_for_comments(line)
-
-        # if the line is empty or is just a comment
-        if not line:
-            continue
-
-        if line.startswith("define"):
-            if len(value := line.split(" ")) != 3:
-                exit(f"Invalid define declaration on line {index}")
-            if value[2].startswith("0b"):
-                if not BIN.is_binary(value[2][2:], len(value[2][2:]))[0]:
-                    exit(f"Binary definition constant has non binary characters on line {index}, a binary number can only have 0s and 1s")
-                DEFINITIONS[value[1]] = str(int(value[2][2:], 2))
-                continue
-            if value[2].startswith("0x"):
-                hex_digits = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
-                # if any digit in the number is not a hex digit
-                if any([digit.lower() not in hex_digits for digit in value[2][2:]]):
-                    exit(f"Hex definition constant has non hex characters on line {index}, a hex number can only have: \n{hex_digits}")
-
-                DEFINITIONS[value[1]] = str(int(value[2][2:], 16))
-                continue
-            if value[2].startswith("-"):
-                if value[2][1:].isdigit():
-                    DEFINITIONS[value[1]] = value[2]
-                    continue
-            elif value[2].isdigit():
-                DEFINITIONS[value[1]] = value[2]
-                continue
-            exit(f"Decimal definition constant has a non decimal character on line {index}")
-
-        # if line is a page declaration
-        if line.startswith(">"):
-            if not line[1:].isdigit():
-                exit(f"Page declaration with a non decimal page number on line {index}")
-            available_pages.remove(int(line[1:]))
-            # 32 instructions per page
-            true_index = int(line[1:]) * 32
-            continue
-
-        # if there is a label
-        if line.startswith("."):
-            if line in LABELS:
-                exit(f"Duplicate label declared on lines {LABELS[line][1]} and {index}")
-            else:
-                LABELS[line] = (BIN.int_to_unsigned(12, true_index), index)
-                continue
-
-        true_index += 1
-    input_file.seek(0)
-    return available_pages
-
-
 def main():
     # Check if the correct number of arguments is provided
-    if len(sys.argv) != 2:
-        exit("Usage: python Assembler.py <programFile>")  # Exit the program with an error code
+    if len(sys.argv) != 3:
+        exit("Usage: python LineAssembler.py <Line> <Index>")  # Exit the program with an error code
 
-    input_file = sys.argv[1]  # The first argument after the script name
+    input_line = sys.argv[1]  # The first argument after the script name
+    line_index = sys.argv[2]
 
-    # Now you can open and process the file
-    try:
-        with open(input_file, 'r') as program_file:
-            dir_path = os.path.dirname(os.path.realpath(__file__))
-            with open(os.path.join(dir_path, "assemblyFile.txt"), 'w') as assembly_file:
-                available_pages = pre_parse_program(program_file)
-                in_page_index = 0
-                true_index = 0
-                index = program_file.tell()
-                line = program_file.readline().strip()
-                while line.startswith("//") or line.startswith(";") or line.startswith("#") or line.startswith("define") or line.startswith("."):
-                    index = program_file.tell()
-                    line = program_file.readline().strip()
-                if not line.startswith(">"):
-                    assembly_file.write(f">{available_pages.pop(0)}\n")
-                program_file.seek(index)
-                for index, line in enumerate(program_file):
-                    line = line.strip()
-                    # parse for comments:
-                    line, comment = parse_for_comments(line)
+    assembled_instruction = ""
 
-                    if not line:
-                        # assembly_file.write(comment + '\n')
-                        continue
+    if input_line.startswith("//") or input_line.startswith("#") or input_line.startswith(";"):
+        exit("")
 
-                    if line.startswith(".") or line.startswith('define'):
-                        continue
+    if input_line.startswith("define"):
+        # ADD CHECKS TO MAKE SURE THE DEFINE IS CORRECTLY WRITTEN
+        exit("")
 
-                    if line.startswith('>'):
-                        assembly_file.write(line)
-                        if comment:
-                            assembly_file.write(" " + comment)
-                        assembly_file.write('\n')
-                        in_page_index = 0
-                        continue
+    if input_line.startswith(">"):
+        try:
+            int(input_line[1:])
+        except ValueError:
+            exit(f"Invalid decimal for page declaration on line {line_index}")
+        print(input_line)
 
-                    line = line.split()
+    split_line = input_line.strip().split(" ")
 
-                    instruction, parameters = line[0], line[1:]
+    if split_line[0] not in INSTRUCTIONS:
+        exit(f"Instruction {split_line[0]} is not a valid instruction")
 
-                    # if there is an unrecognized instruction
-                    if instruction not in INSTRUCTIONS:
-                        exit(f"Invalid instruction {instruction} on line {index}")
-
-                    instruction_information = INSTRUCTIONS[instruction]
-                    possible_parameter_counts, assembled_parameters = instruction_information[
-                        0], instruction_information[1:]
-
-                    # if we're over the limit for the in page index
-                    if in_page_index == 32:
-                        if not available_pages:
-                            exit(f"With currently declared pages and automated pages the program cannot fit.\nplease restructure the program so that instructions after line {index} fit into a page")
-                        assembly_file.write(f'>{available_pages.pop(0)}\n')
-                        in_page_index = 0
-                        continue
-
-                    if len(parameters) not in possible_parameter_counts:
-                        exit(f"Incorrect number of parameters on line {index} for instruction {instruction}")
-
-                    current_parameter_index = 0
-                    for assembled_parameter in assembled_parameters[possible_parameter_counts.index(len(parameters))]:
-                        if callable(assembled_parameter):
-                            assembly_file.write(assembled_parameter(parameters[current_parameter_index].lower(), index, instruction))
-                            current_parameter_index += 1
-                        else:
-                            assembly_file.write(assembled_parameter)
-                    # if comment:
-                    #     assembly_file.write(" " + comment)
-                    assembly_file.write('\n')
-                    true_index += 1
-                    in_page_index += 1
-                for remaining_page in available_pages:
-                    assembly_file.write(f">{remaining_page}\n")
-                assembly_file.write(f"-")
-    except FileNotFoundError:
-        exit(f"Error: File '{input_file}' not found")
-    # print(f"Assembling file: {input_file}")
+    index = 0
+    for item in INSTRUCTIONS[split_line[0]]:
+        if callable(item):
+            assembled_instruction += item(split_line[index].lower(), index, split_line[0])
+            index += 1
+        else:
+            assembled_instruction += split_line[index]
 
 
 if __name__ == "__main__":

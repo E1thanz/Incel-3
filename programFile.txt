@@ -1,14 +1,18 @@
-define secondValue 0x1 // defining the number 1 in hex
-ldi r1 0 // first fib number
-pst r1 1
-ldi r2 secondValue // second fib number
-pst r2 1
->1
-// start of the loop
-.loop
-add r1 r2 r1
-pst r1 1
-add r1 r2 r2
-pst r2 1
-jmp .loop
-// bruh
+define shitnumber 69
+define binaryTest 0b01111111
+>0
+.start
+ldi r7 binaryTest
+add r1 r2 r3
+ldi r4 0b1111000
+prd eq 0 //test 2
+jmp .label
+#test one
+// test 2
+; test 3
+//
+.label
+adi r7 shitnumber
+sub r7 r2 r0
+prd c 0
+jmp .start
