@@ -39,8 +39,6 @@ CONDITIONS = {"novf": "000", "ovf": "001", "nc": "010", "c": "011", "nmsb": "100
               "zero": "111",
               "!=": "110", "=": "111", "<": "010", ">=": "011", ">=0": "100", "<0": "101",
               "!ovf": "000", "!c": "010", "!z": "110", "eq": "111", "neq": "110"}
-LABELS = {}
-DEFINITIONS = {}
 
 
 class PARAMETERS:
@@ -50,41 +48,31 @@ class PARAMETERS:
         try:
             return REGISTERS[value]
         except KeyError:
-            exit(f"Invalid register on line {line} for instruction {instruction}, possible registers are: \n{REGISTERS.keys()}")
+            exit(f"Error: invalid register on line {line} for instruction {instruction}, possible registers are: \n{REGISTERS.keys()}")
 
     @staticmethod
     def Condition(value: str, line: int, instruction: str) -> str:
         try:
             return CONDITIONS[value]
         except KeyError:
-            exit(f"Invalid condition on line {line} for instruction {instruction}, possible conditions are: \n{CONDITIONS.keys()}")
+            exit(f"Error: invalid condition on line {line} for instruction {instruction}, possible conditions are: \n{CONDITIONS.keys()}")
 
     @staticmethod
     def Single(value: str, line: int, instruction: str) -> str:
         if not BIN.is_binary(value, 1)[0]:
-            exit(f"Invalid single on line {line} for instruction {instruction}, a single is either a 0 or a 1")
+            exit(f"Error: invalid single on line {line} for instruction {instruction}, a single is either a 0 or a 1")
         return value
 
     @staticmethod
-    def Label(value: str, line: int, instruction: str) -> str:
-        if value not in LABELS:
-            exit(f"Invalid label on line {line} for instruction {instruction}")
-        return LABELS[value][0]
-
-    @staticmethod
     def Immediate(value: str, bits: int, line: int, instruction: str) -> str:
-
-        if value in DEFINITIONS:
-            value = DEFINITIONS[value]
-
         # if value is in binary form
         if value.startswith("0b"):
             try:
                 if not (redid_value := BIN.is_binary(value[2:], bits))[0]:
-                    exit(f"Non binary value given in a binary form immediate on line {line} for instruction {instruction}, a binary number can only have 0s and 1s")
+                    exit(f"Error: non binary value given in a binary form immediate on line {line} for instruction {instruction}, a binary number can only have 0s and 1s")
                 return redid_value[1]
             except ValueError as exception:
-                exit(f"Invalid binary immediate on line {line} for instruction {instruction}, error: \n{repr(exception)}")
+                exit(f"Error: invalid binary immediate on line {line} for instruction {instruction}, error: \n{repr(exception)}")
 
         # if value is in hex form
         if value.startswith("0x"):
@@ -92,8 +80,7 @@ class PARAMETERS:
 
             # if any digit in the number is not a hex digit
             if any([digit.lower() not in hex_digits for digit in value[2:]]):
-                exit(
-                    f"Non hexadecimal digit in a hexadecimal form immediate on line {line} for instruction {instruction}, a hex number can only have: \n{hex_digits}")
+                exit(f"Error: non hexadecimal digit in a hexadecimal form immediate on line {line} for instruction {instruction}, a hex number can only have: \n{hex_digits}")
 
             return BIN.int_to_unsigned(bits, int(value[2:], 16))
 
@@ -105,12 +92,12 @@ class PARAMETERS:
             conversion_function = BIN.int_to_unsigned
 
         if not value.isdigit():
-            exit(f"Non decimal digit in a decimal form immediate on line {line} for instruction {instruction}")
+            exit(f"Error: non decimal digit in a decimal form immediate on line {line} for instruction {instruction}")
 
         try:
             return conversion_function(bits, int(value))
         except ValueError as exception:
-            exit(f"Invalid decimal immediate on line {line} for instruction {instruction}, error: \n{repr(exception)}")
+            exit(f"Error: invalid decimal immediate on line {line} for instruction {instruction}, error: \n{repr(exception)}")
 
 
 INSTRUCTIONS = {"add": ((3, 4),
@@ -140,9 +127,9 @@ INSTRUCTIONS = {"add": ((3, 4),
                         ("00111", PARAMETERS.Register, PARAMETERS.Register,
                          lambda value, line, instruction: PARAMETERS.Immediate(value, 5, line, instruction))),
                 "jmp": ((1,),
-                        ("0100", PARAMETERS.Label)),
+                        ("0100", lambda value, line, instruction: PARAMETERS.Immediate(value, 12, line, instruction))),
                 "cal": ((1,),
-                        ("0101", PARAMETERS.Label)),
+                        ("0101", lambda value, line, instruction: PARAMETERS.Immediate(value, 12, line, instruction))),
                 "ret": ((0,),
                         ("0110000000000000",)),
                 "rdp": ((0, 1),
@@ -177,40 +164,30 @@ INSTRUCTIONS = {"add": ((3, 4),
 
 def main():
     # Check if the correct number of arguments is provided
-    if len(sys.argv) != 3:
-        exit("Usage: python LineAssembler.py <Line> <Index>")  # Exit the program with an error code
+    if len(sys.argv) != 2:
+        exit("Error: usage is python Line.py <Line>")  # Exit the program with an error code
 
     input_line = sys.argv[1]  # The first argument after the script name
-    line_index = sys.argv[2]
 
     assembled_instruction = ""
 
-    if input_line.startswith("//") or input_line.startswith("#") or input_line.startswith(";"):
-        exit("")
-
-    if input_line.startswith("define"):
-        # ADD CHECKS TO MAKE SURE THE DEFINE IS CORRECTLY WRITTEN
-        exit("")
-
-    if input_line.startswith(">"):
-        try:
-            int(input_line[1:])
-        except ValueError:
-            exit(f"Invalid decimal for page declaration on line {line_index}")
-        print(input_line)
-
-    split_line = input_line.strip().split(" ")
+    split_line = input_line.strip().lower().split(" ")
 
     if split_line[0] not in INSTRUCTIONS:
-        exit(f"Instruction {split_line[0]} is not a valid instruction")
+        exit(f"Error: instruction {split_line[0]} is not a valid instruction")
 
-    index = 0
-    for item in INSTRUCTIONS[split_line[0]]:
+    if len(split_line) - 1 not in INSTRUCTIONS[split_line[0]][0]:
+        exit(f"Error: instruction {split_line[0]} does not have the right amount of parameters")
+
+    index = 1
+    for item in INSTRUCTIONS[split_line[0]][1 + INSTRUCTIONS[split_line[0]][0].index(len(split_line) - 1)]:
         if callable(item):
             assembled_instruction += item(split_line[index].lower(), index, split_line[0])
             index += 1
         else:
-            assembled_instruction += split_line[index]
+            assembled_instruction += item
+
+    print(f"Output: {assembled_instruction}")
 
 
 if __name__ == "__main__":
