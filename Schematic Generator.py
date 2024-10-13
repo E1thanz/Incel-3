@@ -13,7 +13,6 @@ def main():
     # Now you can open and process the file
     try:
         with open(input_file, 'r') as assembly_file:
-            x, z = 0, 0
             lines = assembly_file.readlines()
             index = -1
             while index < len(lines):
@@ -54,7 +53,7 @@ def main():
                     continue
                 index += 1
     except FileNotFoundError:
-        exit(f"Error: File '{input_file}' not found")
+        exit(f"Error: file '{input_file}' not found")
 
     schem.save("./", "program", mcschematic.Version.JE_1_20_PRE_RELEASE_4)
 
