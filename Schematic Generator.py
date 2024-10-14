@@ -4,10 +4,15 @@ import sys
 
 def main():
     # Check if the correct number of arguments is provided
-    if len(sys.argv) != 2:
-        exit("Usage: python Assembler.py <assemblyFile>")  # Exit the program with an error code
+    if len(sys.argv) != 3:
+        exit("Usage: python Assembler.py <assemblyFile> <destination path>")  # Exit the program with an error code
 
     input_file = sys.argv[1]  # The first argument after the script name
+
+    output_file = sys.argv[2]
+    output_file = output_file.split("/")[-1]
+    output_path = sys.argv[2].removesuffix("/" + output_file)
+    output_file = output_file.removesuffix(".schem")
 
     schem = mcschematic.MCSchematic()
     # Now you can open and process the file
@@ -55,7 +60,7 @@ def main():
     except FileNotFoundError:
         exit(f"Error: file '{input_file}' not found")
 
-    schem.save("./", "program", mcschematic.Version.JE_1_20_PRE_RELEASE_4)
+    schem.save(output_path, output_file, mcschematic.Version.JE_1_20_PRE_RELEASE_4)
 
 
 if __name__ == "__main__":
