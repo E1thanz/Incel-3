@@ -1,8 +1,9 @@
 # <u>Incel 3</u>
 
-![Python Version](https://img.shields.io/badge/Python-3.12.6-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)
+![Python Version](https://img.shields.io/badge/Python-3.12.6-blue?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?logo=open-source-initiative&logoColor=white)
+![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen?logo=semantic-release&logoColor=white)
+
 
 ## Table of Contents
 - [Overview](#Overview)
