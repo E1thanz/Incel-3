@@ -1,19 +1,11 @@
-define shitnumber 0b01000101 //test
-define bullshit r2 //test 3
->0 //test
-.start //test
-add r0 r0 bullshit
-add r1 r2 r3
-ldi r4 0b11110000
-prd eq 0 //test 2
-jmp .label
-#test one
-// test 2
-; test 3
-//
->1
-.label
-adi r7 shitnumber
-sub r7 r2 r0
-prd c 0
-jmp .start
+define right 0
+define left 1
+//test file
+ldi r1 10
+ldi r2 -2
+bsh r1 r2 right r1
+ldi r3 2
+ldi r1 10
+bsh r1 r2 right r1
+bsh r1 r3 left r1
+hlt
