@@ -5,7 +5,7 @@ import sys
 def main():
     # Check if the correct number of arguments is provided
     if len(sys.argv) != 3:
-        exit("Usage: python Assembler.py <assemblyFile> <destination path>")  # Exit the program with an error code
+        exit("Usage: python Schematic Generator.py <assemblyFile> <destination path>")  # Exit the program with an error code
 
     input_file = sys.argv[1]  # The first argument after the script name
 
@@ -47,14 +47,14 @@ def main():
                         index += 1
                         line = lines[index].strip()
 
-                    x = 0 if page_number % 2 == 0 else -32
-                    z = 2 * (page_number // 2)
+                    x = -30 if page_number < 64 else -50
+                    z = (2 * (page_number % 64)) - 126
 
                     for i in range(16):
                         compacted = [page[i+16][8:], page[i+16][:8], page[i][8:], page[i][:8]]
                         barrel_values = ["".join([compacted[j][i] for j in range(4)]) for i in range(8)]
                         for y in range(8):
-                            schem.setBlock((x - 2*i, -y*2 - 1, z), "minecraft:magenta_concrete" if int(barrel_values[y], 2) == 0 else mcschematic.BlockDataDB.BARREL.fromSS(int(barrel_values[y], 2)))
+                            schem.setBlock((x + (-2 if x == -50 else 2)*i, -y*2 - 3, z), "minecraft:magenta_concrete" if int(barrel_values[y], 2) == 0 else mcschematic.BlockDataDB.BARREL.fromSS(int(barrel_values[y], 2)))
                     continue
                 index += 1
     except FileNotFoundError:

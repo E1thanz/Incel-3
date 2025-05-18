@@ -1,11 +1,6 @@
-define right 0
-define left 1
-//test file
 ldi r1 10
 ldi r2 -2
-bsh r1 r2 right r1
-ldi r3 2
-ldi r1 10
-bsh r1 r2 right r1
-bsh r1 r3 left r1
+add r1 r2 r3
+ani r1 0b00000011
+sub r3 r1 r3
 hlt
